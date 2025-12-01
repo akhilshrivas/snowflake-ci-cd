@@ -19,22 +19,24 @@ jobs:
 
       - name: Install dependencies
         run: |
+          pip install --upgrade pip
           pip install snowflake-connector-python boto3
+          # Better practice: Create a requirements.txt and run: pip install -r requirements.txt
 
-      - name: DEBUG SNOWFLAKE_USER Secret
-        run: |
-          echo "SNOWFLAKE_USER='$SNOWFLAKE_USER'"
-          if [ -z "$SNOWFLAKE_USER" ]; then
-            echo "❌ SNOWFLAKE_USER is EMPTY (Secret missing or misnamed)"
-            exit 1
-          else
-            echo "✅ SNOWFLAKE_USER is SET correctly"
-          fi
+      - name: Verify Secrets (Safe Debug)
         env:
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+        run: |
+          if [ -z "$SNOWFLAKE_USER" ]; then
+            echo "❌ SNOWFLAKE_USER is EMPTY. Check Repository Settings > Secrets."
+            exit 1
+          else
+            echo "✅ SNOWFLAKE_USER is set (Length: ${#SNOWFLAKE_USER})"
+          fi
 
       - name: Run Snowflake Pipeline Script
         env:
+          # Snowflake Credentials
           SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
           SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
           SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
@@ -42,5 +44,10 @@ jobs:
           SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
           SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
           SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+          
+          # AWS Credentials (Required for boto3)
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: "us-east-1" # Change to your region
         run: |
           python aws_s3/load_json.py
