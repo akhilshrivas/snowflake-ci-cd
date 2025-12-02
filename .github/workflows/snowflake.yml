@@ -26,7 +26,7 @@ jobs:
         snow sql -x \
           --role ACCOUNTADMIN \
           --warehouse COMPUTE_WH \
-          --database MY_DATABASE \
+          --database MY_DATABSE \
           --schema PUBLIC \
           -q "SELECT CURRENT_USER(), CURRENT_ROLE();"
 
@@ -36,7 +36,7 @@ jobs:
           snow sql -x \
             --role ACCOUNTADMIN \
             --warehouse COMPUTE_WH \
-            --database MY_DATABASE\
+            --database MY_DATABSE\
             --schema PUBLIC \
             -f "$file"
         done
