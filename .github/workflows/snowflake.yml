@@ -2,7 +2,7 @@ name: Snowflake Deployment
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   deploy:
@@ -20,6 +20,7 @@ jobs:
     - name: Install SnowCLI
       run: |
         pip install snowflake-cli-labs
+
     - name: Debug Env
       run: env | grep SNOW
 
@@ -34,11 +35,13 @@ jobs:
 
     - name: Deploy SQL Files
       run: |
+        echo "Looking for SQL files in sql/"
         for file in sql/*.sql; do
+          echo "Running $file"
           snow sql -x \
             --role ACCOUNTADMIN \
             --warehouse COMPUTE_WH \
-            --database MY_DATABSE\
+            --database MY_DATABSE \
             --schema PUBLIC \
             -f "$file"
         done
